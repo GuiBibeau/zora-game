@@ -1,0 +1,19 @@
+{
+  "name": "funtf",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "build": "turbo run build --scope=front --include-dependencies --no-deps",
+    "dev": "turbo run dev",
+    "start": "turbo run start",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.14",
+    "turbo": "^1.1.6"
+  }
+}

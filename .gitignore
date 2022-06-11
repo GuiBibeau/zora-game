@@ -1,0 +1,71 @@
+
+Skip to content
+Pull requests
+Issues
+Marketplace
+Explore
+@GuiBibeau
+serif-space /
+serif-website
+Private
+
+Code
+Issues
+Pull requests
+Actions
+Projects
+Security
+Insights
+
+    Settings
+
+serif-website/.gitignore
+@whensbrunch
+whensbrunch update readme and add example env file
+Latest commit fc9d0b1 4 days ago
+History
+2 contributors
+@whensbrunch
+@GuiBibeau
+41 lines (32 sloc) 443 Bytes
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+node_modules
+
+# Next.js
+/.next/
+/out/
+
+# Production
+build
+dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local ENV files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**.env
+**.env.local
+
+# Vercel
+.vercel
+
+# Turborepo
+.turbo
