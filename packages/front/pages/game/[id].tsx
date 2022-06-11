@@ -1,4 +1,4 @@
-import { GameId } from "components/PageGameId/GameId";
+import { GameBoard } from "components/GameBoard";
 import { GameProvider } from "hooks/GameContext";
 import { type GetServerSideProps, type NextPage } from "next";
 import { SWRConfig } from "swr";
@@ -15,7 +15,7 @@ export const GameRoom: NextPage<Props> = ({ fallback, id, playerId }) => {
   return (
     <SWRConfig value={{ fallback }}>
       <GameProvider id={id} playerId={playerId}>
-        <GameId />
+        <GameBoard />
       </GameProvider>
     </SWRConfig>
   );
@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       fallback: {
         [`/api/game?id=${id}`]: { game, players },
         ...(playerId && {
-          [`/api/player?playerId=${playerId}&gameId${id}`]: {
+          [`/api/player?playerId=${playerId}&gameId=${id}`]: {
             ...players[playerId],
           },
         }),

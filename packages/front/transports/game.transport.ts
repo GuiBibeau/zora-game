@@ -1,13 +1,6 @@
-import {
-  DEFAULT_ACTION_POINTS,
-  DEFAULT_LIVES,
-  DEFAULT_MAX_PLAYERS,
-  DEFAULT_RANGE,
-} from "../constants";
 import { getRandomRoomCode } from "helpers/getRandomRoomCode";
 import { redis } from "lib/redis";
-import { Player } from "models/player";
-import { Coordinate, GameState, isCoordinate, isGameState, Turn } from "types";
+import { GameState, isGameState } from "types";
 
 export const createGame = async () => {
   const id = getRandomRoomCode();

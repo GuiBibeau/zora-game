@@ -133,3 +133,11 @@ export function isCoordinate(value: any): value is Coordinate {
     value === "7G"
   );
 }
+
+export type Player = {
+  id: string;
+  range: number;
+  lives: number;
+  position: Coordinate;
+  actionPoints: number;
+};

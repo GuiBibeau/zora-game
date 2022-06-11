@@ -5,8 +5,7 @@ import {
   DEFAULT_ACTION_POINTS,
 } from "../constants";
 import { redis } from "lib/redis";
-import { Player } from "models/player";
-import { Coordinate, isCoordinate } from "types/game";
+import { Coordinate, isCoordinate, Player } from "types/game";
 
 export const addPlayer = async ({
   gameId,

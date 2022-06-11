@@ -1,16 +1,19 @@
 import { fetchAPI } from "helpers/fetcher";
-import { Game } from "models/game";
+import { emptyPositions } from "models/board";
+import { proxy } from "valtio";
 import * as React from "react";
 import useSwr from "swr";
+import { GamePayload } from "transports/game.transport";
 import { APIGetGame } from "types/api";
+import { Coordinate, isCoordinate, Player } from "types/game";
 
-type Action =
-  | ({ type: "setGame" } & APIGetGame)
-  | { type: "setCurrentPlayer"; id: string };
-
-type Dispatch = (action: Action) => void;
-
-type State = { id: string; game?: Game };
+type State = {
+  id: string;
+  game: GamePayload;
+  playerId?: string;
+  setPlayerId: (playerId: string) => void;
+  players?: Record<string, Player>;
+};
 
 type Props = {
   id: string;
@@ -20,72 +23,74 @@ type Props = {
 export const GameStateContext = React.createContext<State | undefined>(
   undefined
 );
-export const GameDispatchContext = React.createContext<Dispatch | undefined>(
-  undefined
-);
 
-function gameReducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "setGame": {
-      const { game, players } = action;
-
-      const gameInstance = new Game({
-        playersOrder: action.game.order,
-        id: state.id,
-        turns: [],
-        status: game.status,
-        players,
-      });
-
-      return { ...state, game: gameInstance };
-    }
-    case "setCurrentPlayer":
-      // state.game?.addPlayer(action.id);
-
-      return { ...state };
-    default:
-      throw new Error("Unhandled action");
-  }
-}
+export const positions = proxy(emptyPositions);
 
 export function GameProvider({
   children,
   id,
-  playerId,
+  playerId: initialPlayerId,
 }: React.PropsWithChildren<Props>) {
-  console.log(playerId);
   const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI);
-  const { data: playerData } = useSwr(
-    `/api/player?playerId=${playerId}&gameId=${id}`,
-    fetchAPI
+  const [playerId, setPlayerId] = React.useState<string | undefined>(
+    initialPlayerId
   );
-
-  console.log(playerData);
-
-  const initialGame = new Game({
-    playersOrder: data?.game.order ? data.game.order : [],
-    id: data?.game.id ? data.game?.id : "",
-    turns: [],
-    status: data?.game.status ? data.game.status : "WAITING",
-  });
-
-  const [state, dispatch] = React.useReducer(gameReducer, {
-    id,
-    game: initialGame,
-  });
 
   React.useEffect(() => {
-    if (data) {
-      dispatch({ type: "setGame", ...data });
+    if (data?.positions) {
+      for (const coordinate in data?.positions) {
+        if (isCoordinate(coordinate)) {
+          positions[coordinate] = data.positions[coordinate];
+        }
+      }
     }
-  }, [data]);
+  }, [data?.positions]);
 
-  // both context are separate since a lot of components will use the context. this will avoid rerenders
   return (
-    <GameDispatchContext.Provider value={dispatch}>
-      <GameStateContext.Provider value={state}>
-        {children}
-      </GameStateContext.Provider>
-    </GameDispatchContext.Provider>
+    <GameStateContext.Provider
+      value={{
+        id,
+        game: data?.game!,
+        playerId,
+        setPlayerId,
+        players: data?.players,
+      }}
+    >
+      {children}
+    </GameStateContext.Provider>
   );
 }
+
+export const useGameInstance = () => {
+  const context = React.useContext(GameStateContext);
+  if (!context) {
+    throw new Error("useGameInstance must be used within a GameProvider");
+  }
+  const { game } = context;
+  return game;
+};
+
+export const useBoard = () => {
+  const context = React.useContext(GameStateContext);
+  if (!context) {
+    throw new Error("useBoard must be used within a GameProvider");
+  }
+};
+
+export const usePlayerId = () => {
+  const context = React.useContext(GameStateContext);
+  if (!context) {
+    throw new Error("usePlayerId must be used within a GameProvider");
+  }
+  const { playerId, setPlayerId } = context;
+  return { playerId, setPlayerId };
+};
+
+export const usePlayers = () => {
+  const context = React.useContext(GameStateContext);
+  if (!context) {
+    throw new Error("usePLayers must be used within a GameProvider");
+  }
+  const { players } = context;
+  return players;
+};
