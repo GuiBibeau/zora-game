@@ -6,7 +6,6 @@ import useSwr from "swr";
 import { GamePayload } from "transports/game.transport";
 import { APIGetGame } from "types/api";
 import { Coordinate, isCoordinate, Player } from "types/game";
-import { usePrevious } from "./usePrevious";
 
 type State = {
   id: string;
@@ -33,14 +32,12 @@ export function GameProvider({
   id,
   playerId: initialPlayerId,
 }: React.PropsWithChildren<Props>) {
-  const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI, {
-    refreshInterval: 5000,
-  });
+  const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI);
   const { data: positions } = useSwr<any>(
     `/api/positions?gameId=${id}`,
     fetchAPI,
     {
-      refreshInterval: 2500,
+      refreshInterval: 500,
     }
   );
 

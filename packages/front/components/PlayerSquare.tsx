@@ -1,12 +1,5 @@
 import { type FC } from "react";
-import { Coordinate, isCoordinate } from "types/game";
-import cn from "clsx";
-import { useGamePositions } from "hooks/useGamePositions";
-import useSwr from "swr";
-import { useGameInstance, usePlayerId } from "hooks/GameContext";
-import { fetchAPI } from "helpers/fetcher";
-import { boardGraph } from "models/board";
-import { useMovePlayer } from "hooks/useMovePlayer";
+import { Coordinate } from "types/game";
 
 type Props = {
   id: Coordinate;

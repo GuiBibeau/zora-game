@@ -8,6 +8,7 @@ import { GameSquare } from "./GameSquare";
 import { useMovePlayer } from "hooks/useMovePlayer";
 import { useStartGame } from "hooks/useStartGame";
 import { Coordinate } from "types/game";
+import { EmptySquare } from "./EmptySquare";
 
 export const GameBoard: FC = () => {
   const { id, status, currentPlayer, currentTurn, nextPlayer } =
@@ -26,6 +27,9 @@ export const GameBoard: FC = () => {
     startGame();
   };
 
+  const boardKeys = Object.keys(boardGraph);
+  const isWaiting = status === "WAITING";
+
   return (
     <div>
       <h1>
@@ -39,9 +43,14 @@ export const GameBoard: FC = () => {
       </h1>
       <h1>{currentPlayer} is playing</h1>
       <section className="grid-cols-7 grid-rows-7 grid">
-        {Object.keys(boardGraph).map((square) => {
-          return <GameSquare id={square as Coordinate} key={square} />;
-        })}
+        {isWaiting
+          ? boardKeys.map((key) => (
+              <EmptySquare key={key} id={key as Coordinate} />
+            ))
+          : boardKeys.map((square) => {
+              return <GameSquare id={square as Coordinate} key={square} />;
+            })}
+        {}
         {!playerData && <button onClick={joinGame}>Join game</button>}
       </section>
       {status === "WAITING" && (

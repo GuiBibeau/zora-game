@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { startGame } from "transports/game.transport";
-import { movePlayer } from "transports/player.transport";
+import { attackPlayer, movePlayer } from "transports/player.transport";
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,6 +22,9 @@ export default async function handler(
         return res.status(200).send("success");
       case "move":
         movePlayer(req.body);
+        return res.status(200).send("success");
+      case "attack":
+        attackPlayer(req.body);
         return res.status(200).send("success");
       default:
         res.status(400).json({});

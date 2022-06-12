@@ -102,7 +102,6 @@ export const movePlayer = async ({
   playerId,
   position,
   previousPosition,
-  turn,
 }: {
   gameId: string;
   playerId: string;
@@ -110,23 +109,22 @@ export const movePlayer = async ({
   previousPosition: Coordinate;
   turn: number;
 }) => {
-  // const curr = await redis.hget(gameId, "currentPlayer");
-  // const next = await redis.hget(gameId, "nextPlayer");
-  // // await redis.hset(gameId, "nextPlayer", "EYjzbt055SR6nf6vqR0KH");
-
-  // console.log(curr, next);
-  // return;
-
   // make sure it's the player's turn
   const currentPlayer = await redis.hget(`${gameId}`, "currentPlayer");
 
   if (currentPlayer !== playerId) {
     throw new Error("It's not your turn");
   }
+
   // check if the player has enough action points. Discusting typings for hackathon :(
   const player = (await getPlayer(gameId, playerId)) as unknown as Player;
   if (player.actionPoints < 1) {
     throw new Error("You don't have enough action points");
+  }
+
+  //check if player still has lives
+  if (player.lives < 1) {
+    throw new Error("You don't have any lives left");
   }
 
   // check if the player is not trying to move to a position that's already occupied
@@ -160,8 +158,64 @@ export const movePlayer = async ({
     "actionPoints"
   );
 
-  console.log({ actionPoints });
   // if the player has no action points left, it's their turn over, so we need to set the next player
+  if (actionPoints === "0") {
+    await nextPlayer(gameId);
+  }
+};
+
+export const attackPlayer = async ({
+  gameId,
+  playerId,
+  target,
+}: {
+  gameId: string;
+  playerId: string;
+  target: Coordinate;
+}) => {
+  // make sure it's the player's turn
+  const currentPlayer = await redis.hget(`${gameId}`, "currentPlayer");
+
+  if (currentPlayer !== playerId) {
+    throw new Error("It's not your turn");
+  }
+  // check if the player has enough action points. Discusting typings for hackathon :(
+  const player = (await getPlayer(gameId, playerId)) as unknown as Player;
+  if (player.actionPoints < 1) {
+    throw new Error("You don't have enough action points");
+  }
+
+  // check if player still has lives
+  if (player.lives < 1) {
+    throw new Error("You don't have any lives left");
+  }
+
+  //validate that the target is in range
+  if (!boardGraph[player.position].has(target)) {
+    throw new Error("Target is out of range");
+  }
+
+  // ensure there is a player at the target position
+  const targetPlayer = await redis.hget(`${gameId}:positions`, target);
+  if (!targetPlayer) {
+    throw new Error("There is no player at the target position");
+  }
+
+  // once all conditions are met, we can attack the player
+  await redis
+    .multi()
+    // decrement the player's action points
+    .hincrby(`${gameId}:players:${playerId}`, "actionPoints", -1)
+    // decrement the target player's lives
+    .hincrby(`${gameId}:players:${targetPlayer}`, "lives", -1)
+    .exec();
+
+  // if the player has no action points left, it's their turn over, so we need to set the next player
+  const actionPoints = await redis.hget(
+    `${gameId}:players:${playerId}`,
+    "actionPoints"
+  );
+
   if (actionPoints === "0") {
     await nextPlayer(gameId);
   }

@@ -90,15 +90,58 @@ export const nextPlayer = async (gameId: string) => {
   // get the order of the players
   const order = await redis.lrange(`${gameId}:order`, 0, -1);
   // get the index of the current player in the order
-  const nextPlayerIndex = order.indexOf(nextPlayer!);
+  let nextPlayerIndex = order.indexOf(nextPlayer!);
+
   //from the order set the current and next player
   const newCurrentPlayer = nextPlayer;
-  const newNextPlayer =
+  let newNextPlayer =
     nextPlayerIndex === order.length - 1
       ? order[0]
       : order[nextPlayerIndex + 1];
 
-  console.log(newCurrentPlayer, newNextPlayer);
+  // verify if the next player still has lives
+  let newNextPlayerLives = await redis.hget(
+    `${gameId}:players:${newNextPlayer}`,
+    "lives"
+  );
+
+  const playerWithLives = await Promise.all(
+    order.map(async (player) => {
+      const lives = await redis.hget(`${gameId}:players:${player}`, "lives");
+      return {
+        player,
+        lives,
+      };
+    })
+  );
+
+  // check if only one player has lives
+  if (playerWithLives.filter((p) => p.lives !== "0").length === 1) {
+    // set the winner as the player with lives
+    await redis.hset(gameId, "status", "FINISHED");
+    return;
+  }
+
+  // if the new next player has no lives, get the next player in the order until he has lives
+  while (newNextPlayerLives === "0") {
+    // verify if the next player is the last one in the order
+    nextPlayerIndex++;
+    if (nextPlayerIndex === order.length - 1) {
+      newNextPlayer = order[0];
+    }
+    // get the next player in the order
+    newNextPlayer = order[nextPlayerIndex];
+    // get the lives of the next player
+    newNextPlayerLives = await redis.hget(
+      `${gameId}:players:${newNextPlayer}`,
+      "lives"
+    );
+    // if the next player is the current player again, the game is over
+    if (newNextPlayer === currentPlayer) {
+      await redis.hset(`${gameId}`, "status", "FINISHED");
+      break;
+    }
+  }
 
   // update the current player and next player in the database
   await redis

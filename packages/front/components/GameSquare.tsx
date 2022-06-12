@@ -6,10 +6,10 @@ import useSwr from "swr";
 import { useGameInstance, usePlayerId } from "hooks/GameContext";
 import { fetchAPI } from "helpers/fetcher";
 import { boardGraph } from "models/board";
-import { useMovePlayer } from "hooks/useMovePlayer";
 import { PlayerSquare } from "./PlayerSquare";
 import { EnemySquare } from "./EnemySquare";
 import { TargetSquare } from "./TargetSquare";
+import { EmptySquare } from "./EmptySquare";
 
 type Props = {
   id: Coordinate;
@@ -22,7 +22,10 @@ export const GameSquare: FC<Props> = ({ id }) => {
   const { playerId } = usePlayerId();
   const { data: playerData } = useSwr(
     playerId ? `/api/player?playerId=${playerId}&gameId=${gameId}` : null,
-    fetchAPI
+    fetchAPI,
+    {
+      refreshInterval: 1000,
+    }
   );
 
   // player square
@@ -30,15 +33,15 @@ export const GameSquare: FC<Props> = ({ id }) => {
     return <PlayerSquare id={id} />;
   }
 
-  // player can move to those squares
-  if (playerData && boardGraph[playerData.position as Coordinate].has(id)) {
-    return <TargetSquare id={id} />;
-  }
-
   // enemy positions
   if (id in positions) {
     return <EnemySquare id={id} />;
   }
 
-  return <span className="h-12 w-12 bg-blue-400  border">{id}</span>;
+  // player can move to those squares
+  if (playerData && boardGraph[playerData.position as Coordinate].has(id)) {
+    return <TargetSquare id={id} />;
+  }
+
+  return <EmptySquare id={id} />;
 };
