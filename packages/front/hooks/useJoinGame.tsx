@@ -3,25 +3,25 @@ import { nanoid } from "nanoid";
 import Cookies from "js-cookie";
 import { useSWRConfig } from "swr";
 import { positions, useGameInstance, usePlayerId } from "./GameContext";
-import { randomFreeCoordinate } from "models/board";
+import { emptyPositions, randomFreeCoordinate } from "models/board";
 import { Player } from "types/game";
 import {
   DEFAULT_ACTION_POINTS,
   DEFAULT_LIVES,
   DEFAULT_RANGE,
 } from "../constants";
-import { useSnapshot } from "valtio";
+import { useGamePositions } from "./useGamePositions";
 
 export const useJoinGame = (id?: string) => {
   const { mutate } = useSWRConfig();
   const { id: gameId, order } = useGameInstance();
-  const positionSnap = useSnapshot(positions);
+  const positions = useGamePositions();
 
   const { setPlayerId } = usePlayerId();
   const playerId = id || nanoid();
 
   return async () => {
-    const position = randomFreeCoordinate(positionSnap);
+    const position = randomFreeCoordinate({ ...emptyPositions, ...positions });
     positions[position] = playerId;
 
     const player: Player = {
@@ -38,7 +38,6 @@ export const useJoinGame = (id?: string) => {
       method: "POST",
       data: {
         ...player,
-        order: [...order, playerId].sort(() => Math.random() - 0.5),
       },
     });
 

@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { setGameOrder } from "transports/game.transport";
 import { addPlayer } from "transports/player.transport";
 
 export default async function handler(
@@ -24,10 +23,9 @@ export default async function handler(
       return res.status(400).json({ error: "playerId is wrong" });
     }
 
-    const { position, order } = req.body;
+    const { position } = req.body;
 
     const player = await addPlayer({ playerId, position, gameId });
-    await setGameOrder(gameId, order);
 
     return res.status(200).json(player);
   }

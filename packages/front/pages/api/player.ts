@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { setGameOrder } from "transports/game.transport";
 import { getPlayer } from "transports/player.transport";
 
 export default async function handler(

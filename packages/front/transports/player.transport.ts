@@ -5,7 +5,7 @@ import {
   DEFAULT_ACTION_POINTS,
 } from "../constants";
 import { redis } from "lib/redis";
-import { Coordinate, isCoordinate, Player } from "types/game";
+import { Coordinate, isCoordinate, MoveTurn, Player, Turn } from "types/game";
 
 export const addPlayer = async ({
   gameId,
@@ -17,7 +17,8 @@ export const addPlayer = async ({
   position: Coordinate;
 }) => {
   try {
-    const status = await redis.get(`${gameId}:status`);
+    const status = await redis.hget(`${gameId}`, "status");
+    console.log(status);
     if (status !== "WAITING") {
       throw new Error("Game is already started or finished");
     }
@@ -37,9 +38,10 @@ export const addPlayer = async ({
       actionPoints: DEFAULT_ACTION_POINTS,
     };
 
-    const res = await redis
+    await redis
       .multi()
       .sadd(`${gameId}:players`, playerId)
+      .hset(`${gameId}:positions`, position, playerId)
       .hset(`${gameId}:players:${playerId}`, data)
       .exec();
 
@@ -92,4 +94,37 @@ export const getPlayers = async (gameId: string, playerIds: string[]) => {
     }
     return acc;
   }, {});
+};
+
+export const movePlayer = async ({
+  gameId,
+  playerId,
+  position,
+  previousPosition,
+  turn,
+}: {
+  gameId: string;
+  playerId: string;
+  position: Coordinate;
+  previousPosition: Coordinate;
+  turn: number;
+}) => {
+  // make sure it's the player's turn
+  const currentPlayer = await redis.hget(`${gameId}:turn`, "currentPlayer");
+
+  // const data: MoveTurn = {
+  //   playerId,
+  //   type: "MOVE",
+  //   from: previousPosition,
+  //   to: position,
+  //   turn,
+  // };
+  // await redis
+  //   .multi()
+  //   .hdel(`${gameId}:positions`, previousPosition)
+  //   .hset(`${gameId}:positions`, position, playerId)
+  //   .hset(`${gameId}:players:${playerId}`, "position", position)
+  //   .hset(gameId, "currentTurn", turn)
+  //   .hset(`${gameId}:turns:${turn}`, data)
+  //   .exec();
 };

@@ -6,6 +6,7 @@ import useSwr from "swr";
 import { GamePayload } from "transports/game.transport";
 import { APIGetGame } from "types/api";
 import { Coordinate, isCoordinate, Player } from "types/game";
+import { usePrevious } from "./usePrevious";
 
 type State = {
   id: string;
@@ -13,6 +14,7 @@ type State = {
   playerId?: string;
   setPlayerId: (playerId: string) => void;
   players?: Record<string, Player>;
+  positions: Record<Coordinate, string>;
 };
 
 type Props = {
@@ -31,20 +33,20 @@ export function GameProvider({
   id,
   playerId: initialPlayerId,
 }: React.PropsWithChildren<Props>) {
-  const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI);
+  const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI, {
+    refreshInterval: 5000,
+  });
+  const { data: positions } = useSwr<any>(
+    `/api/positions?gameId=${id}`,
+    fetchAPI,
+    {
+      refreshInterval: 2500,
+    }
+  );
+
   const [playerId, setPlayerId] = React.useState<string | undefined>(
     initialPlayerId
   );
-
-  React.useEffect(() => {
-    if (data?.positions) {
-      for (const coordinate in data?.positions) {
-        if (isCoordinate(coordinate)) {
-          positions[coordinate] = data.positions[coordinate];
-        }
-      }
-    }
-  }, [data?.positions]);
 
   return (
     <GameStateContext.Provider
@@ -54,6 +56,7 @@ export function GameProvider({
         playerId,
         setPlayerId,
         players: data?.players,
+        positions,
       }}
     >
       {children}

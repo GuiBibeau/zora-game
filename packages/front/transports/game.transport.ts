@@ -4,7 +4,17 @@ import { GameState, isGameState } from "types";
 
 export const createGame = async () => {
   const id = getRandomRoomCode();
-  await redis.multi().set(`${id}:status`, "WAITING").sadd(`games`, id).exec();
+  await redis
+    .multi()
+    .hset(`${id}`, {
+      id,
+      status: "WAITING",
+      currentPlayer: "",
+      currentTurn: 0,
+      nextPlayer: "",
+    })
+    .sadd(`games`, id)
+    .exec();
   return id;
 };
 
@@ -12,48 +22,63 @@ export type GamePayload = {
   id: string;
   status: GameState;
   currentPlayer: string;
+  currentTurn: number;
   nextPlayer: string;
   players: string[];
   order: string[];
 };
 
 export const getGame = async (id: string): Promise<GamePayload> => {
-  const gameState = await redis
-    .multi()
-    .get(`${id}:status`)
-    .get(`${id}:order`)
-    .get(`${id}:currentPlayer`)
-    .get(`${id}:nextPlayer`)
-    .smembers(`${id}:players`)
-    .exec();
+  const game = await redis.hgetall(`${id}`);
+  const players = await redis.smembers(`${id}:players`);
+  const order = await redis.lrange(`${id}:order`, 0, -1);
 
-  if (!gameState) {
+  if (!game) {
     throw new Error("Game not found");
   }
 
-  const [
-    [, status],
-    [, order],
-    [, currentPlayer],
-    [, nextPlayer],
-    [, players],
-  ] = gameState;
-
   return {
-    id,
-    status: isGameState(status) ? status : "WAITING",
-    currentPlayer: typeof currentPlayer === "string" ? currentPlayer : "",
-    nextPlayer: typeof nextPlayer === "string" ? nextPlayer : "",
-    players: Array.isArray(players) ? players.map(String) : [],
-    order: order ? String(order).split(",") : [],
-  };
+    ...game,
+    players,
+    order,
+  } as GamePayload;
 };
 
-export const setGameOrder = async (gameId: string, order: string[]) => {
-  const status = await redis.get(`${gameId}:status`);
+export const getPositions = async (gameId: string) => {
+  const positions = await redis.hgetall(`${gameId}:positions`);
+  if (!positions) {
+    throw new Error("Game not found");
+  }
+  return positions;
+};
+
+export const startGame = async (gameId: string) => {
+  const status = await redis.hget(gameId, "status");
+  // check if the game is already started or ended
   if (status !== "WAITING") {
     throw new Error("Game is already started or finished");
   }
+  console.log("hello");
 
-  await redis.set(`${gameId}:order`, order.join(","));
+  // check if the game has at least two players
+  const players = await redis.smembers(`${gameId}:players`);
+  if (players.length < 2) {
+    throw new Error("Game must have at least two players");
+  }
+
+  // get all the players and shuffle them into an order saved as a list
+  const order = players.sort(() => Math.random() - 0.5);
+
+  // set the first player as the current player and the second player as the next player
+  if (!order) {
+    throw new Error("Game must have an order");
+  }
+  const [currentPlayer, nextPlayer] = order;
+  await redis
+    .multi()
+    .hset(`${gameId}`, "status", "PLAYING")
+    .rpush(`${gameId}:order`, ...order)
+    .hset(`${gameId}`, "currentPlayer", currentPlayer)
+    .hset(`${gameId}`, "nextPlayer", nextPlayer)
+    .exec();
 };

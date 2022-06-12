@@ -69,10 +69,13 @@ export type UpgradeParams = {
 
 export type Turn = {
   type: PlayerActionType;
-  params: MoveParams | ShootParams | UpgradeParams;
   turn: number;
   playerId: string;
 };
+
+export type MoveTurn = Turn & MoveParams;
+export type ShootTurn = Turn & ShootParams;
+export type UpgradeTurn = Turn & UpgradeParams;
 
 export type GameState = "WAITING" | "PLAYING" | "FINISHED";
 

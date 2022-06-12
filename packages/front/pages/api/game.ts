@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { createGame, getGame } from "transports/game.transport";
+import { createGame, getGame, getPositions } from "transports/game.transport";
 import { getPlayers } from "transports/player.transport";
-
-import { Coordinate, isCoordinate } from "types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,18 +17,10 @@ export default async function handler(
     }
     const game = await getGame(id);
     const players = await getPlayers(id, game.players);
-    const positions = Object.entries(players).reduce(
-      (acc, [playerId, playerData]) => {
-        acc[playerData.position] = playerId;
-        return acc;
-      },
-      {} as Record<Coordinate, string>
-    );
 
     res.status(200).json({
       game,
       players,
-      positions,
     });
   }
 
