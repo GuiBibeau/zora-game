@@ -30,12 +30,12 @@ export const GameSquare: FC<Props> = ({ id }) => {
 
   // player square
   if (playerData && playerData.position === id) {
-    return <PlayerSquare id={id} />;
+    return <PlayerSquare id={id} playerId={playerData.id} />;
   }
 
   // enemy positions
   if (id in positions) {
-    return <EnemySquare id={id} />;
+    return <EnemySquare id={id} enemyId={positions[id]} />;
   }
 
   // player can move to those squares

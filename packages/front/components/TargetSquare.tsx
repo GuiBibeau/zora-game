@@ -24,18 +24,14 @@ export const TargetSquare: FC<Props> = ({ id }) => {
     }
   );
   const movePlayer = useMovePlayer(gameId, playerData.position);
-  const baseClass = "h-12 w-12 border";
+  const baseClass = "h-12 w-12 border: hover:scale-125";
 
   const handleMove = async () => {
     await movePlayer(id);
   };
   const classes = cn(
     baseClass,
-    " border-2 border-purple-700 cursor-pointer bg-blue-400"
+    " border-2 border-gray-100 cursor-pointer bg-gray-400 rounded-full shadow-xl"
   );
-  return (
-    <span onClick={handleMove} className={classes}>
-      {id}
-    </span>
-  );
+  return <span onClick={handleMove} className={classes}></span>;
 };
