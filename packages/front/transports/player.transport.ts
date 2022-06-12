@@ -13,10 +13,12 @@ export const addPlayer = async ({
   gameId,
   playerId,
   position,
+  avatar,
 }: {
   gameId: string;
   playerId: string;
   position: Coordinate;
+  avatar: string;
 }) => {
   try {
     const status = await redis.hget(`${gameId}`, "status");
@@ -37,6 +39,7 @@ export const addPlayer = async ({
       lives: DEFAULT_LIVES,
       range: DEFAULT_RANGE,
       actionPoints: DEFAULT_ACTION_POINTS,
+      avatar,
     };
 
     await redis
@@ -91,6 +94,7 @@ export const getPlayers = async (gameId: string, playerIds: string[]) => {
         lives: typeof player.lives === "number" ? player.lives : 3,
         actionPoints:
           typeof player.actionPoints === "number" ? player.actionPoints : 1,
+        avatar: typeof player.avatar === "string" ? player.avatar : "",
       };
     }
     return acc;

@@ -32,7 +32,9 @@ export function GameProvider({
   id,
   playerId: initialPlayerId,
 }: React.PropsWithChildren<Props>) {
-  const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI);
+  const { data } = useSwr<APIGetGame>(`/api/game?id=${id}`, fetchAPI, {
+    refreshInterval: 1000,
+  });
   const { data: positions } = useSwr<any>(
     `/api/positions?gameId=${id}`,
     fetchAPI,

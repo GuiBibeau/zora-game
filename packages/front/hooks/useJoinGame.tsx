@@ -20,7 +20,7 @@ export const useJoinGame = (id?: string) => {
   const { setPlayerId } = usePlayerId();
   const playerId = id || nanoid();
 
-  return async () => {
+  return async (url: string) => {
     const position = randomFreeCoordinate({ ...emptyPositions, ...positions });
     positions[position] = playerId;
 
@@ -30,6 +30,7 @@ export const useJoinGame = (id?: string) => {
       lives: DEFAULT_LIVES,
       range: DEFAULT_RANGE,
       actionPoints: DEFAULT_ACTION_POINTS,
+      avatar: url,
     };
 
     setPlayerId(playerId);
