@@ -6,6 +6,8 @@ import {
 } from "../constants";
 import { redis } from "lib/redis";
 import { Coordinate, isCoordinate, MoveTurn, Player, Turn } from "types/game";
+import { boardGraph } from "models/board";
+import { nextPlayer } from "./game.transport";
 
 export const addPlayer = async ({
   gameId,
@@ -18,7 +20,6 @@ export const addPlayer = async ({
 }) => {
   try {
     const status = await redis.hget(`${gameId}`, "status");
-    console.log(status);
     if (status !== "WAITING") {
       throw new Error("Game is already started or finished");
     }
@@ -109,22 +110,59 @@ export const movePlayer = async ({
   previousPosition: Coordinate;
   turn: number;
 }) => {
-  // make sure it's the player's turn
-  const currentPlayer = await redis.hget(`${gameId}:turn`, "currentPlayer");
+  // const curr = await redis.hget(gameId, "currentPlayer");
+  // const next = await redis.hget(gameId, "nextPlayer");
+  // // await redis.hset(gameId, "nextPlayer", "EYjzbt055SR6nf6vqR0KH");
 
-  // const data: MoveTurn = {
-  //   playerId,
-  //   type: "MOVE",
-  //   from: previousPosition,
-  //   to: position,
-  //   turn,
-  // };
-  // await redis
-  //   .multi()
-  //   .hdel(`${gameId}:positions`, previousPosition)
-  //   .hset(`${gameId}:positions`, position, playerId)
-  //   .hset(`${gameId}:players:${playerId}`, "position", position)
-  //   .hset(gameId, "currentTurn", turn)
-  //   .hset(`${gameId}:turns:${turn}`, data)
-  //   .exec();
+  // console.log(curr, next);
+  // return;
+
+  // make sure it's the player's turn
+  const currentPlayer = await redis.hget(`${gameId}`, "currentPlayer");
+
+  if (currentPlayer !== playerId) {
+    throw new Error("It's not your turn");
+  }
+  // check if the player has enough action points. Discusting typings for hackathon :(
+  const player = (await getPlayer(gameId, playerId)) as unknown as Player;
+  if (player.actionPoints < 1) {
+    throw new Error("You don't have enough action points");
+  }
+
+  // check if the player is not trying to move to a position that's already occupied
+  const usedPositions = await redis.hgetall(`${gameId}:positions`);
+
+  if (usedPositions[position]) {
+    throw new Error("Position is already occupied");
+  }
+
+  // check if the player is not trying to move to a position that's out of range
+  if (!boardGraph[previousPosition].has(position)) {
+    throw new Error("Position is out of range");
+  }
+
+  // once we've checked all the conditions, we can move the player
+  await redis
+    .multi()
+    // set the new position in the hash
+    .hset(`${gameId}:positions`, position, playerId)
+    // remove the old position from the hash
+    .hdel(`${gameId}:positions`, previousPosition)
+    // decrement the player's action points
+    .hincrby(`${gameId}:players:${playerId}`, "actionPoints", -1)
+    // set the position on the user hash
+    .hset(`${gameId}:players:${playerId}`, "position", position)
+    .exec();
+
+  // check how many actions the player has left
+  const actionPoints = await redis.hget(
+    `${gameId}:players:${playerId}`,
+    "actionPoints"
+  );
+
+  console.log({ actionPoints });
+  // if the player has no action points left, it's their turn over, so we need to set the next player
+  if (actionPoints === "0") {
+    await nextPlayer(gameId);
+  }
 };

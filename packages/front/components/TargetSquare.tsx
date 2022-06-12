@@ -8,14 +8,12 @@ import { fetchAPI } from "helpers/fetcher";
 import { boardGraph } from "models/board";
 import { useMovePlayer } from "hooks/useMovePlayer";
 import { PlayerSquare } from "./PlayerSquare";
-import { EnemySquare } from "./EnemySquare";
-import { TargetSquare } from "./TargetSquare";
 
 type Props = {
   id: Coordinate;
 };
 
-export const GameSquare: FC<Props> = ({ id }) => {
+export const TargetSquare: FC<Props> = ({ id }) => {
   const { id: gameId } = useGameInstance();
   const positions = useGamePositions();
 
@@ -24,21 +22,19 @@ export const GameSquare: FC<Props> = ({ id }) => {
     playerId ? `/api/player?playerId=${playerId}&gameId=${gameId}` : null,
     fetchAPI
   );
+  const movePlayer = useMovePlayer(gameId, playerData.position);
+  const baseClass = "h-12 w-12 border";
 
-  // player square
-  if (playerData && playerData.position === id) {
-    return <PlayerSquare id={id} />;
-  }
-
-  // player can move to those squares
-  if (playerData && boardGraph[playerData.position as Coordinate].has(id)) {
-    return <TargetSquare id={id} />;
-  }
-
-  // enemy positions
-  if (id in positions) {
-    return <EnemySquare id={id} />;
-  }
-
-  return <span className="h-12 w-12 bg-blue-400  border">{id}</span>;
+  const handleMove = () => {
+    movePlayer(id);
+  };
+  const classes = cn(
+    baseClass,
+    " border-2 border-purple-700 cursor-pointer bg-blue-400"
+  );
+  return (
+    <span onClick={handleMove} className={classes}>
+      {id}
+    </span>
+  );
 };
