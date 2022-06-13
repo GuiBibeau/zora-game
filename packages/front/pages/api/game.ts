@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { createGame, getGame, getPositions } from "transports/game.transport";
+import { createGame, getGame } from "transports/game.transport";
 import { getPlayers } from "transports/player.transport";
 
 export default async function handler(

@@ -143,4 +143,5 @@ export type Player = {
   lives: number;
   position: Coordinate;
   actionPoints: number;
+  avatar?: string;
 };

@@ -11,7 +11,6 @@ export default async function handler(
 
   if (req.method === "GET") {
     const { playerId, gameId } = req.query;
-    console.log(playerId, gameId);
 
     if (!playerId || typeof playerId !== "string") {
       return res.status(400).json({ error: "playerId is wrong" });

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -14,3 +15,23 @@ module.exports = {
   },
   plugins: [],
 };
+=======
+require("@tailwindcss/aspect-ratio"),
+  /** @type {import('tailwindcss').Config} */
+  (
+    module.exports = {
+      content: [
+        "./pages/**/*.{js,ts,jsx,tsx}",
+        "./components/**/*.{js,ts,jsx,tsx}",
+      ],
+      theme: {
+        extend: {
+          fontFamily: {
+            bangers: ["Bangers", "cursive"],
+          },
+        },
+      },
+      plugins: [require("@tailwindcss/aspect-ratio")],
+    }
+  );
+>>>>>>> f822bc72740e37defa1bccb5d92f9c3147e3e7d9

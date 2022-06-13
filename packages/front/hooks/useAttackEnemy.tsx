@@ -2,19 +2,18 @@ import { fetchAPI } from "helpers/fetcher";
 import Cookies from "js-cookie";
 import { Coordinate } from "types/game";
 
-export const useMovePlayer = (gameId: string, currentPosition: Coordinate) => {
+export const useAttackEnemy = (gameId: string) => {
   const playerId = Cookies.get(gameId);
 
-  return async (position: Coordinate) => {
+  return async (target: Coordinate) => {
     if (!playerId) return;
 
-    await fetchAPI(`/api/action?type=move`, {
+    await fetchAPI(`/api/action?type=attack`, {
       method: "POST",
       data: {
-        playerId,
-        position,
         gameId,
-        previousPosition: currentPosition,
+        playerId,
+        target,
       },
     });
   };

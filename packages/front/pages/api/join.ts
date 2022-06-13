@@ -23,9 +23,9 @@ export default async function handler(
       return res.status(400).json({ error: "playerId is wrong" });
     }
 
-    const { position } = req.body;
+    const { position, avatar } = req.body;
 
-    const player = await addPlayer({ playerId, position, gameId });
+    const player = await addPlayer({ playerId, position, gameId, avatar });
 
     return res.status(200).json(player);
   }
