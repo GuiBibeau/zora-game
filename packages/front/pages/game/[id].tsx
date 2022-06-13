@@ -1,4 +1,9 @@
+<<<<<<< HEAD
+import { GameBoard } from "components/GameBoard";
+import { PlayerBoard } from "components/PlayerBoard";
+=======
 import { Gameroom } from "components/GameRoom";
+>>>>>>> f822bc72740e37defa1bccb5d92f9c3147e3e7d9
 import { GameProvider } from "hooks/GameContext";
 import { getSession, useWen } from "wen-connect";
 import { type GetServerSideProps, type NextPage } from "next";
@@ -27,7 +32,12 @@ export const GameRoom: NextPage<Props> = ({
   return (
     <SWRConfig value={{ fallback }}>
       <GameProvider id={id} playerId={playerId}>
+<<<<<<< HEAD
+        <GameBoard />
+        <PlayerBoard />
+=======
         <Gameroom session={session} />
+>>>>>>> f822bc72740e37defa1bccb5d92f9c3147e3e7d9
       </GameProvider>
     </SWRConfig>
   );
