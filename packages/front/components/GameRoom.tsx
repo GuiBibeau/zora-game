@@ -28,41 +28,46 @@ export const Gameroom: FC<Props> = ({ session }) => {
     fetchAPI
   );
 
-  const handleStart = () => {
-    startGame();
-  };
-
   const boardKeys = Object.keys(boardGraph);
   const isWaiting = status === "WAITING";
 
+  const lives = playerData ? new Array(Number(playerData.lives)).fill("❤") : [];
+  const turnLabel =
+    currentPlayer === playerId
+      ? "Your turn: choose a player to attack or a spot to move!"
+      : "waiting on other players";
+
   return (
-    <>
+    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-screen flex flex-col items-center">
       {isWaiting ? (
         <JoinGame session={session} />
       ) : (
         <>
-          <h1>
-            GAME: {id} is {status}
-          </h1>
-          <h1>
-            {currentPlayer &&
-              `You are ${playerData.id} your position is ${playerData.position}, you have{" "}
-        ${playerData.lives} lives and you have ${playerData.actionPoints} action.
-        Your range is ${playerData.range}`}
-          </h1>
-          <h1>{currentPlayer} is playing</h1>
-          <section className="grid-cols-7 grid-rows-7 grid">
-            {isWaiting
-              ? boardKeys.map((key) => (
-                  <EmptySquare key={key} id={key as Coordinate} />
-                ))
-              : boardKeys.map((square) => {
-                  return <GameSquare id={square as Coordinate} key={square} />;
-                })}
-            {}
-          </section>
+          <h1 className="font-bangers text-3xl mt-12">Battleshot!</h1>
+          <h1 className="font-bangers text-xl">Room: {id}</h1>
+
+          {currentPlayer && (
+            <h1 className="font-bangers text-xl">Lives: {lives.join("")}</h1>
+          )}
+
+          <h1 className="font-bangers">{turnLabel}</h1>
+
+          <div className="max-w-5xl flex justify-center mt-8">
+            <section className="grid-cols-7 grid-rows-7 grid gap-2">
+              {isWaiting
+                ? boardKeys.map((key) => (
+                    <EmptySquare key={key} id={key as Coordinate} />
+                  ))
+                : boardKeys.map((square) => {
+                    return (
+                      <GameSquare id={square as Coordinate} key={square} />
+                    );
+                  })}
+              {}
+            </section>
+          </div>
         </>
       )}
-    </>
+    </div>
   );
 };

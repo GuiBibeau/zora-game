@@ -7,7 +7,11 @@ require("@tailwindcss/aspect-ratio"),
         "./components/**/*.{js,ts,jsx,tsx}",
       ],
       theme: {
-        extend: {},
+        extend: {
+          fontFamily: {
+            bangers: ["Bangers", "cursive"],
+          },
+        },
       },
       plugins: [require("@tailwindcss/aspect-ratio")],
     }
