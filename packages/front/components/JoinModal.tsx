@@ -134,7 +134,8 @@ export const JoinModal: FC<Props> = ({ open, setOpen, session }) => {
                     <button
                       type="button"
                       onClick={handleConnect}
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                      style={{ boxShadow: "rgb(0, 0, 0) 10px 10px 0px 0px" }}
+                      className=" h-16 inline-flex items-center justify-center rounded-md   shadow-sm px-4 py-2 text-black border-4 border-black text-base font-medium sm:col-start-2 sm:text-sm"
                     >
                       Connect Wallet
                     </button>
