@@ -29,7 +29,7 @@ export const GameSquare: FC<Props> = ({ id }) => {
   );
 
   // player square
-  if (playerData && playerData.position === id) {
+  if (playerData && playerData?.position === id) {
     return <PlayerSquare id={id} playerId={playerData.id} />;
   }
 

@@ -97,16 +97,10 @@ export const JoinModal: FC<Props> = ({ open, setOpen, session }) => {
             >
               <Dialog.Panel className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6">
                 <div>
-                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
-                    <IdentificationIcon
-                      className="h-6 w-6 text-red-600"
-                      aria-hidden="true"
-                    />
-                  </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg leading-6 font-medium text-gray-900"
+                      className="text-2xl leading-6 font-medium text-gray-900 font-bangers"
                     >
                       Connect your wallet and choose your NFT
                     </Dialog.Title>
@@ -148,7 +142,8 @@ export const JoinModal: FC<Props> = ({ open, setOpen, session }) => {
                     <button
                       type="button"
                       onClick={handleJoin}
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                      style={{ boxShadow: "rgb(0, 0, 0) 10px 10px 0px 0px" }}
+                      className=" h-16 inline-flex items-center justify-center rounded-md   shadow-sm px-4 py-2 text-black border-4 border-black text-base font-medium sm:col-start-2 sm:text-sm"
                     >
                       {data?.tokens?.nodes?.length === 0
                         ? "No NFT? play with Nicolas Cage!"
@@ -157,7 +152,8 @@ export const JoinModal: FC<Props> = ({ open, setOpen, session }) => {
                   )}
                   <button
                     type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                    style={{ boxShadow: "rgb(0, 0, 0) 10px 10px 0px 0px" }}
+                    className="h-16 w-48 flex shadow-3xl justify-center border-4 border-black items-center  px-6 py-3   text-base font-medium rounded-md text-gray-700 bg-white "
                     onClick={() => setOpen(false)}
                     ref={cancelButtonRef}
                   >

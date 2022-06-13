@@ -31,7 +31,9 @@ export const Gameroom: FC<Props> = ({ session }) => {
   const boardKeys = Object.keys(boardGraph);
   const isWaiting = status === "WAITING";
 
-  const lives = playerData ? new Array(Number(playerData.lives)).fill("❤") : [];
+  const lives = playerData?.lives
+    ? new Array(Number(playerData.lives)).fill("❤")
+    : [];
   const turnLabel =
     currentPlayer === playerId
       ? "Your turn: choose a player to attack or a spot to move!"

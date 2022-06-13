@@ -39,15 +39,15 @@ export const JoinGame: FC<Props> = ({ session }) => {
   };
 
   return (
-    <div className="bg-white">
+    <div className="">
       <JoinModal open={open} setOpen={setOpen} session={session} />
       <div className="mx-auto py-12 px-4 max-w-7xl sm:px-6 lg:px-8 lg:py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-8">
           <div className="space-y-5 sm:space-y-4">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl font-bangers">
               Battleshot!
             </h2>
-            <p className="text-xl text-gray-500">
+            <p className="text-2xl font-bangers">
               Join this tactical game of strategy and war! Your in game avatar
               is your NFT image!
             </p>
@@ -55,7 +55,8 @@ export const JoinGame: FC<Props> = ({ session }) => {
               <button
                 onClick={() => setOpen(true)}
                 type="button"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                style={{ boxShadow: "rgb(0, 0, 0) 10px 10px 0px 0px" }}
+                className="h-16 w-48 flex shadow-3xl justify-center border-4 border-black items-center  px-6 py-3   text-base font-medium rounded-md text-gray-700 bg-white "
               >
                 Join the game!
               </button>
@@ -63,7 +64,8 @@ export const JoinGame: FC<Props> = ({ session }) => {
               <button
                 onClick={handleStart}
                 type="button"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                style={{ boxShadow: "rgb(0, 0, 0) 10px 10px 0px 0px" }}
+                className="h-16 w-48 flex shadow-3xl justify-center border-4 border-black items-center  px-6 py-3   text-base font-medium rounded-md text-gray-700 bg-white "
               >
                 Start game
               </button>
