@@ -1,4 +1,5 @@
 import { GameBoard } from "components/GameBoard";
+import { PlayerBoard } from "components/PlayerBoard";
 import { GameProvider } from "hooks/GameContext";
 import { type GetServerSideProps, type NextPage } from "next";
 import { SWRConfig } from "swr";
@@ -20,6 +21,7 @@ export const GameRoom: NextPage<Props> = ({ fallback, id, playerId }) => {
     <SWRConfig value={{ fallback }}>
       <GameProvider id={id} playerId={playerId}>
         <GameBoard />
+        <PlayerBoard />
       </GameProvider>
     </SWRConfig>
   );
